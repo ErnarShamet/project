@@ -1,0 +1,55 @@
+<!--templates/anime/detail.html-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="anime-detail">
+    <h1>{{ anime.title }}</h1>
+    <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
+
+    <h2>Описание</h2>
+    <p>{{ anime.description }}</p>
+
+    <h2>Информация</h2>
+    <ul>
+        <li><strong>Жанр:</strong> {{ anime.genre }}</li>
+        <li><strong>Количество эпизодов:</strong> {{ anime.total_episodes }}</li>
+        <li><strong>Статус:</strong> {{ anime.status }}</li>
+    </ul>
+
+    <h2>Персонажи</h2>
+    <div class="characters">
+        {% for character in characters %}
+            <div class="character-card">
+                <img src="{{ character.image_url }}" alt="{{ character.name }}">
+                <h3>{{ character.name }}</h3>
+                <a href="{{ url_for('character_detail', character_id=character.id) }}">Подробнее</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>Отзывы</h2>
+    {% if reviews %}
+        {% for review in reviews %}
+            <div class="review">
+                <p>{{ review.user.username }} - {{ review.rating }}/5</p>
+                <p>{{ review.comment }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Отзывов пока нет</p>
+    {% endif %}
+
+    {% if 'username' in session %}
+    <h3>Добавить отзыв</h3>
+    <form action="{{ url_for('add_review', anime_id=anime.id) }}" method="POST">
+        <select name="rating">
+            {% for i in range(1, 6) %}
+                <option value="{{ i }}">{{ i }} звезд</option>
+            {% endfor %}
+        </select>
+        <textarea name="comment" placeholder="Ваш отзыв"></textarea>
+        <button type="submit">Отправить</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

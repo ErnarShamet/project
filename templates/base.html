@@ -1,0 +1,135 @@
+<!--/newpythonProject/templates/templates/base.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}One Piece{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Пользовательский CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <!-- SEO оптимизация -->
+    <meta name="description" content="Все о аниме One Piece">
+    <meta name="keywords" content="One Piece, аниме, манга, Pirates">
+    <!-- Производительность -->
+    <link rel="preload" href="{{ url_for('static', filename='css/main.css') }}" as="style">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="One Piece Logo" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
+
+                    <!-- Dropdown для One Piece -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="onePieceDropdown" role="button" data-toggle="dropdown">
+                            One Piece
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/about">О сериале</a>
+                            <a class="dropdown-item" href="/anime/one-piece">Аниме</a>
+                            <a class="dropdown-item" href="/manga">Манга</a>
+                            <a class="dropdown-item" href="/characters">Персонажи</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="communityDropdown" role="button" data-toggle="dropdown">
+                            Сообщество
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/news">Новости</a>
+                            <a class="dropdown-item" href="/ratings">Рейтинги</a>
+                            <a class="dropdown-item" href="/forum">Форум</a>
+                        </div>
+                    </li>
+
+                    {% if session['username'] %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                            {{ session['username'] }}
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/profile">Профиль</a>
+                            <a class="dropdown-item" href="/logout">Выйти</a>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="authDropdown" role="button" data-toggle="dropdown">
+                            Вход/Регистрация
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/login">Войти</a>
+                            <a class="dropdown-item" href="/register">Регистрация</a>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <main id="main-content">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <footer class="mt-4 text-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Навигация</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="/">Главная</a></li>
+                            <li><a href="/about">О сериале</a></li>
+                            <li><a href="/anime">Аниме</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Сообщество</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="/forum">Форум</a></li>
+                            <li><a href="/news">Новости</a></li>
+                            <li><a href="/ratings">Рейтинги</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Социальные сети</h5>
+                        <div class="social-icons">
+                            <a href="#" class="text-white mr-3"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="text-white mr-3"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <p>&copy; 2025 One Piece Fan Site. Все права защищены.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- jQuery, Popper.js, Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Font Awesome для иконок социальных сетей -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</body>
+</html>

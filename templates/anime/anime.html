@@ -1,0 +1,46 @@
+<!--/newpythonProject/templates/anime/anime.html-->
+{% extends 'base.html' %}
+
+{% block title %}Anime List{% endblock %}
+
+{% block content %}
+<h2>Anime List</h2>
+<p>Explore various anime genres, including One Piece!</p>
+
+<div class="anime-list">
+    <div class="anime-item">
+        <h3>One Piece</h3>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/Straw_Hat_Pirates/Anime_OnePiece_Wallpaper_StrawHatPirates_Complete.jpg') }}" alt="One Piece" />
+        <p>Join Monkey D. Luffy and his crew on their epic adventures across the Grand Line in search of the ultimate treasure, the One Piece!</p>
+        <a href="/anime/one_piece">Learn more</a>
+    </div>
+
+    <div class="anime-item">
+        <h3>Naruto</h3>
+        <img src="{{ url_for('static', filename='images/naruto/characters/Naruto Uzumaki.jpg') }}" alt="Naruto" />
+        <p>Follow Naruto Uzumaki, a young ninja with dreams of becoming the strongest ninja and leader of his village.</p>
+        <a href="/anime/naruto">Learn more</a>
+    </div>
+
+    <div class="anime-item">
+        <h3>Attack on Titan</h3>
+        <img src="{{ url_for('static', filename='images/attack_on_titan/characters/attack_on_titan.jpg') }}" alt="Attack on Titan" />
+        <p>In a world where humanity is on the brink of extinction due to giant humanoid creatures known as Titans, follow the story of Eren Yeager and his friends as they fight for survival.</p>
+        <a href="/anime/attack_on_titan">Learn more</a>
+    </div>
+
+    <div class="anime-item">
+        <h3>My Hero Academia</h3>
+        <img src="{{ url_for('static', filename='images/My Hero Academia/characters/my_hero_academia.png') }}" alt="My Hero Academia" />
+        <p>In a world where almost every human has superpowers, follow Izuku Midoriya as he strives to become a hero despite being born without powers.</p>
+        <a href="/anime/my_hero_academia">Learn more</a>
+    </div>
+
+    <div class="anime-item">
+        <h3>Demon Slayer</h3>
+        <img src="{{ url_for('static', filename='images/demon_slayer/characters/demon_slayer.jpg') }}" alt="Demon Slayer" />
+        <p>Follow Tanjiro Kamado as he becomes a demon slayer to avenge his family and save his sister from a demon curse.</p>
+        <a href="/anime/demon_slayer">Learn more</a>
+    </div>
+</div>
+{% endblock %}

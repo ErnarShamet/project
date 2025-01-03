@@ -1,0 +1,1013 @@
+Как мы можем оптимизировать внешний вид сайта?
+flaskr/
+│
+├── users.db
+├── app.py               # Основной файл приложения
+├── templates/           # Папка для HTML-шаблонов
+│   ├── about.html       # Страница "О нас"
+│   ├── anime.html       # Страница с аниме
+│   ├── index.html      
+│   ├── 404.html      
+│   ├── 500.html      
+│   ├── manga.html       # Страница с мангой
+│   ├── news.html        # Страница новостей
+│   ├── ratings.html     # Страница рейтингов
+│   ├── forum.html       # Страница форума
+│   ├── profile.html     # Страница профиля пользователя
+│   ├── characters.html   # Страница с персонажами
+│   ├── base.html        # Базовый шаблон
+│   ├── auth/            # Папка для шаблонов аутентификации
+│   │   ├── register.html # Шаблон для регистрации
+│   │   └── login.html    # Шаблон для входа
+└── static/              # Папка для статических файлов
+    └── css/             # Папка для CSS
+        └── main.css     # Ваш CSS файл
+    └── images/          # Папка для изображений
+        ├── one_piece/ # Папка изображения one_piece
+        │   └── characters
+        │       ├── Пираты Соломенной Шляпы:
+        │       ├── Пираты Багги:
+        │       ├── Пираты Куронеко:
+        │       ├── Пираты Крейга:
+        │       ├── Пираты Арлонга:
+        │       ├── Королевство Сакура:
+        │       ├── Тёмное Королевство Драм:
+        │       ├── Барок Воркс:
+        │       ├── Алабаста:
+        │       ├── Скайпия:
+        │       ├── Пираты Фокси:
+        │       └── Триллер Барк:
+        │
+        ├── magic_battle/ # Папка изображения magic_battle
+        │   └── characters
+        │       ├── Токийский столичный колледж магии:
+        │       │   ├── Директор:
+        │       │   ├── Преподаватели:
+        │       │   └── Ученики:
+        │       ├── Киотская техническая школа магии:
+        │       │   ├── Директор:
+        │       │   ├── Преподаватели:
+        │       │   └── Ученики:
+        │       ├── Клан Зенин:
+        │       │   ├── Глава:
+        │       │   ├── Члены клана:
+        │       │   └── Ученики:
+        │       └── Семья Гэто:
+        │           ├── Глава:
+        │           ├── Члены семьи:
+        │           └── Ученики:
+        │
+        └── black_clover/ # Папка изображения black_clover
+            └── characters
+                ├── Clover Kingdom:
+                │   ├── Royal Houses:
+                │   ├── House Silva:
+                │   └── House Vermillion:
+                ├── Noble Houses:
+                │   ├── House Adlai:
+                │   ├── House Boismortier:
+                │   ├── House Faust:
+                │   ├── House Vaude:
+                │   └── House Freese:
+                ├── Commoner Families:
+                │   └── Agrippa Family:
+                └── Семья Гэто:
+                    ├── Глава:
+                    ├── Члены семьи:
+                    └── Ученики:
+
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_caching import Cache
+from flask import Blueprint
+from flask_debugtoolbar import DebugToolbarExtension
+from datetime import datetime
+
+app = Flask(__name__)
+app.secret_key = '12345678'
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['CACHE_TYPE'] = 'simple'
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+cache = Cache(app)
+anime_bp = Blueprint('anime', __name__)
+app.debug = True
+toolbar = DebugToolbarExtension(app)
+
+# В командной строке:
+# flask db init
+# flask db migrate -m "Initial migration."
+# flask db upgrade
+
+# Модель пользователя
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login = db.Column(db.DateTime)
+
+    # Связи с другими моделями
+    reviews = db.relationship('Review', backref='user', lazy=True)
+    forum_posts = db.relationship('ForumPost', backref='author', lazy=True)
+
+# Модель аниме
+class Anime(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    genre = db.Column(db.String(50), nullable=False)
+    image_url = db.Column(db.String(200))
+    release_date = db.Column(db.Date)
+
+    # Связи
+    reviews = db.relationship('Review', backref='anime', lazy=True)
+
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rating = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+
+# Создание базы данных и таблиц
+with app.app_context():
+    db.create_all()
+    print('База данных и таблицы созданы!')
+
+@app.route('/')
+@app.route('/index')
+def index():
+    return render_template("index.html")
+
+@app.route('/about')
+def about():
+    return render_template("about.html")
+
+@app.route('/anime/add', methods=['GET', 'POST'])
+def add_anime():
+    if request.method == 'POST':
+        title = request.form['title']
+        description = request.form['description']
+        genre = request.form['genre']
+        image_url = request.form['image_url']
+
+        new_anime = Anime(title=title, description=description, genre=genre, image_url=image_url)
+        db.session.add(new_anime)
+        db.session.commit()
+        flash('Аниме добавлено успешно!')
+        return redirect(url_for('anime_list'))
+
+    return render_template('anime/add.html')
+
+@anime_bp.route('/anime')
+@app.route('/anime')
+def anime_list():
+    animes = Anime.query.with_entities(Anime.title, Anime.image_url).all()
+    return render_template('anime.html', animes=animes)
+
+app.register_blueprint(anime_bp)
+
+# Редактирование аниме
+@app.route('/anime/edit/<int:anime_id>', methods=['GET', 'POST'])
+def edit_anime(anime_id):
+    anime = Anime.query.get_or_404(anime_id)
+
+    if request.method == 'POST':
+        anime.title = request.form['title']
+        anime.description = request.form['description']
+        anime.genre = request.form['genre']
+        anime.image_url = request.form['image_url']
+
+        db.session.commit()
+        flash('Аниме обновлено успешно!')
+        return redirect(url_for('anime_list'))
+
+    return render_template('anime/edit.html', anime=anime)
+
+# Удаление аниме
+@app.route('/anime/delete/<int:anime_id>', methods=['POST'])
+def delete_anime(anime_id):
+    anime = Anime.query.get_or_404(anime_id)
+    db.session.delete(anime)
+    db.session.commit()
+    flash('Аниме удалено успешно!')
+    return redirect(url_for('anime_list'))
+
+@app.route('/manga')
+def manga():
+    return render_template("manga.html")
+
+@app.route('/news')
+def news():
+    return render_template("news.html")
+
+@app.route('/ratings')
+def ratings():
+    return render_template("ratings.html")
+
+@app.route('/forum')
+def forum():
+    return render_template("forum.html")
+
+@app.route('/profile')
+def profile():
+    if 'username' in session:
+        return render_template("profile.html", username=session['username'])
+    else:
+        flash('Пожалуйста, войдите в систему, чтобы просмотреть свой профиль.')
+        return redirect(url_for('login'))
+
+@app.route('/characters')
+def characters():
+    return render_template("characters.html")
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        existing_user = User.query.filter_by(username=username).first()
+
+        if existing_user:
+            flash('Пользователь с таким именем уже существует.')
+        else:
+            new_user = User(username=username, password=generate_password_hash(password))
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Регистрация прошла успешно! Теперь вы можете войти.')
+            return redirect(url_for('login'))
+    return render_template('auth/register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password_hash, password):
+            session['username'] = username
+            flash('Вы успешно вошли в систему!')
+            return redirect(url_for('index'))
+        else:
+            flash('Неверное имя пользователя или пароль.')
+    return render_template('auth/login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    flash('Вы вышли из системы.')
+    return redirect(url_for('index'))
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('500.html'), 500
+
+@app.errorhandler(Exception)
+def exception_handler(error):
+    db.session.rollback()
+    return render_template('500.html'), 500
+
+def test_index(client):
+    response = client.get('/')
+    assert response.status_code == 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+<!--/newpythonProject/templates/templates/about.html-->
+{% extends 'base.html' %}
+
+{% block title %}About One Piece{% endblock %}
+
+{% block content %}
+<h2>About One Piece</h2>
+<p>One Piece is a popular anime and manga series created by Eiichiro Oda. It first premiered in Shueisha's Weekly Shōnen Jump magazine in July 1997 and has since become one of the best-selling manga series of all time.</p>
+
+<h3>Plot Overview</h3>
+<p>The story follows the adventures of Monkey D. Luffy, a young pirate with the ability to stretch his body like rubber after eating a Devil Fruit. Luffy sets out on a journey to find the ultimate treasure known as the One Piece and become the Pirate King.</p>
+
+<h3>Main Characters</h3>
+<ul>
+    <li><strong>Monkey D. Luffy:</strong> The main protagonist and captain of the Straw Hat Pirates.</li>
+    <li><strong>Roronoa Zoro:</strong> The swordsman of the crew, aiming to become the world's greatest swordsman.</li>
+    <li><strong>Nami:</strong> The navigator of the crew, skilled in cartography and navigation.</li>
+    <li><strong>Usopp:</strong> The sharpshooter and storyteller of the crew.</li>
+    <li><strong>Sanji:</strong> The cook of the crew, known for his exceptional culinary skills.</li>
+</ul>
+
+<h3>Impact and Legacy</h3>
+<p>One Piece has had a significant impact on the anime and manga industry, inspiring countless adaptations, merchandise, and even theme park attractions. Its themes of friendship, adventure, and perseverance resonate with fans around the world.</p>
+
+<h3>Learn More</h3>
+<p>For more information about the series, check out the following links:</p>
+<ul>
+    <li><a href="/anime">Explore Anime</a></li>
+    <li><a href="/manga">Discover Manga</a></li>
+    <li><a href="/characters">Meet the Characters</a></li>
+    <li><a href="/news">Latest News</a></li>
+</ul>
+
+<h3>Images</h3>
+<div class="image-gallery">
+    <img src="{{ url_for('static', filename='images/one_piece/characters/luffy.jpg') }}" alt="Luffy" />
+    <img src="{{ url_for('static', filename='images/one_piece/characters/zoro.jpg') }}" alt="Zoro" />
+    <img src="{{ url_for('static', filename='images/one_piece/characters/nami.jpg') }}" alt="Nami" />
+</div>
+{% endblock %}
+
+<!--/newpythonProject/templates/templates/base.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}One Piece{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <a class="navbar-brand" href="/">One Piece</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/anime">Anime</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/manga">Manga</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/news">News</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/ratings">Ratings</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/forum">Forum</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main-content">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <footer>
+            <p>&copy; 2025 | Anime Site</p>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+<!--/newpythonProject/templates/templates/characters.html-->
+{% extends 'base.html' %}
+
+{% block title %}Characters{% endblock %}
+
+{% block content %}
+<h2>Characters from One Piece</h2>
+<div class="character">
+    <h3>Monkey D. Luffy</h3>
+    <img src="{{ url_for('static', filename='images/one_piece/characters/luffy.jpg') }}" alt="Luffy" />
+    <p>Captain of the Straw Hat Pirates and the main protagonist of One Piece.</p>
+</div>
+<div class="character">
+    <h3>Roronoa Zoro</h3>
+    <img src="{{ url_for('static', filename='images/one_piece/characters/zoro.jpg') }}" alt="Zoro" />
+    <p>The swordsman of the Straw Hat Pirates, known for his ambition to become the world's greatest swordsman.</p>
+</div>
+<div class="character">
+    <h3>Nami</h3>
+    <img src="{{ url_for('static', filename='images/one_piece/characters/nami.jpg') }}" alt="Nami" />
+    <p>The navigator of the Straw Hat Pirates, known for her cartography skills and love for treasure.</p>
+</div>
+{% endblock %}
+
+<!--/newpythonProject/templates/templates/forum.html-->
+{% extends 'base.html' %}
+
+{% block title %}Forum{% endblock %}
+
+{% block content %}
+<h2>Forum</h2>
+<p>Join discussions about One Piece, share theories, and connect with other fans!</p>
+
+<div class="forum-topics">
+    <h3>Existing Topics</h3>
+    <ul>
+        <li>
+            <h4><a href="#topic1">Theories about Luffy's Dream</a></h4>
+            <p>Discuss what you think Luffy's ultimate goal is and how he will achieve it!</p>
+        </li>
+        <li>
+            <h4><a href="#topic2">Favorite Straw Hat Crew Member</a></h4>
+            <p>Who is your favorite member of the Straw Hat Pirates and why?</p>
+        </li>
+        <li>
+            <h4><a href="#topic3">Best Fights in One Piece</a></h4>
+            <p>Share your favorite battles and what made them epic!</p>
+        </li>
+    </ul>
+</div>
+
+<div class="create-topic">
+    <h3>Create a New Topic</h3>
+    <form>
+        <label for="topic">Topic Title:</label>
+        <input type="text" id="topic" placeholder="Enter topic title" required />
+
+        <label for="description">Description:</label>
+        <textarea id="description" placeholder="Enter topic description" required></textarea>
+
+        <button type="submit">Post</button>
+    </form>
+</div>
+
+<div class="recent-posts">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li>
+            <strong>User123:</strong> I think Luffy will become the Pirate King by uniting all the pirates!
+        </li>
+        <li>
+            <strong>AnimeFan456:</strong> Zoro's fight against Mihawk was the best moment in the series!
+        </li>
+    </ul>
+</div>
+{% endblock %}
+
+<!--/newpythonProject/templates/templates/index.html-->
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2>Welcome to the World of One Piece!</h2>
+<p>One Piece is a popular anime and manga series created by Eiichiro Oda. It follows the adventures of Monkey D. Luffy and his pirate crew in their quest to find the ultimate treasure known as the One Piece.</p>
+
+<h3>Latest News</h3>
+<ul>
+    <li><a href="/news">New episode release every Sunday!</a></li>
+    <li><a href="/news">Upcoming movie: One Piece Red!</a></li>
+    <li><a href="/news">One Piece manga hits 1000 chapters!</a></li>
+</ul>
+
+<h3>Popular Anime</h3>
+<div class="popular-anime">
+    <div class="anime-item">
+        <h4>One Piece</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/Straw_Hat_Pirates/Anime_OnePiece_Wallpaper_StrawHatPirates_Complete.jpg') }}" alt="One Piece" />
+        <p>Join Luffy and his crew on their epic adventures across the Grand Line in search of the ultimate treasure, the One Piece!</p>
+        <a href="/anime">Learn more</a>
+    </div>
+    <div class="anime-item">
+        <h4>Naruto</h4>
+        <img src="{{ url_for('static', filename='images/naruto/characters/anime_characters.jpg') }}" alt="Naruto" />
+        <p>Follow Naruto Uzumaki as he strives to become the strongest ninja and leader of his village.</p>
+        <a href="/anime/naruto">Learn more</a>
+    </div>
+    <div class="anime-item">
+        <h4>Attack on Titan</h4>
+        <img src="{{ url_for('static', filename='images/attack_on_titan/characters/attack_on_titan.jpg') }}" alt="Attack on Titan" />
+        <p>In a world where humanity is on the brink of extinction due to giant humanoid creatures known as Titans, follow the story of Eren Yeager and his friends as they fight for survival.</p>
+        <a href="/anime/attack_on_titan">Learn more</a>
+    </div>
+</div>
+
+<h3>Featured Characters</h3>
+<div class="featured-characters">
+    <div class="character-item">
+        <h4>Monkey D. Luffy</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/Straw_Hat_Pirates/luffy.jpg') }}" alt="Luffy" />
+        <p>The captain of the Straw Hat Pirates, known for his rubber body and adventurous spirit.</p>
+    </div>
+    <div class="character-item">
+        <h4>Roronoa Zoro</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/Straw_Hat_Pirates/Roronoa Zoro.png') }}" alt="Zoro" />
+        <p>The swordsman of the Straw Hat Pirates, aiming to become the world's greatest swordsman.</p>
+    </div>
+    <div class="character-item">
+        <h4>Nami</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/Straw_Hat_Pirates/Nami.png') }}" alt="Nami" />
+        <p>The navigator of the Straw Hat Pirates, skilled in cartography and navigation.</p>
+    </div>
+</div>
+
+<h3>Join the Community</h3>
+<p>Discuss your favorite episodes, share theories, and connect with other fans on our <a href="/forum">forum</a>.</p>
+
+<h3>Follow Us</h3>
+<p>Stay connected with us on social media:</p>
+<ul class="social-media">
+    <li><a href="https://twitter.com/OnePiece" target="_blank">Twitter</a></li>
+    <li><a href="https://www.facebook.com/OnePiece" target="_blank">Facebook</a></li>
+    <li><a href="https://www.instagram.com/onepiece_official" target="_blank">Instagram</a></li>
+</ul>
+{% endblock %}
+
+
+<!--/newpythonProject/templates/templates/manga.html-->
+{% extends 'base.html' %}
+
+{% block title %}Manga Information{% endblock %}
+
+{% block content %}
+<h2>One Piece Manga Information</h2>
+<p>One Piece is a long-running manga series written and illustrated by Eiichiro Oda. It has been serialized in Shueisha's Weekly Shōnen Jump since July 1997 and has become one of the best-selling manga series of all time.</p>
+
+<h3>Plot Overview</h3>
+<p>The story follows Monkey D. Luffy and his pirate crew as they search for the ultimate treasure known as the One Piece. The manga is known for its rich world-building, diverse characters, and intricate plotlines.</p>
+
+<h3>Story Arcs</h3>
+<ul>
+    <li><strong>East Blue Saga:</strong> The beginning of Luffy's journey and the introduction of key characters.</li>
+    <li><strong>Alabasta Saga:</strong> Luffy and his crew help Princess Vivi save her kingdom from the warlord Crocodile.</li>
+    <li><strong>Sky Island Saga:</strong> The crew explores the sky islands and encounters the enigmatic Enel.</li>
+    <li><strong>Marineford Saga:</strong> A major conflict involving the Marines and the Whitebeard Pirates.</li>
+    <li><strong>Wano Country Saga:</strong> The Straw Hats ally with the samurai to take down the tyrant Kaido.</li>
+</ul>
+
+<h3>Main Characters</h3>
+<div class="character-gallery">
+    <div class="character-item">
+        <h4>Monkey D. Luffy</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/luffy.jpg') }}" alt="Luffy" />
+        <p>The main protagonist and captain of the Straw Hat Pirates.</p>
+    </div>
+    <div class="character-item">
+        <h4>Roronoa Zoro</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/zoro.jpg') }}" alt="Zoro" />
+        <p>The swordsman of the crew, aiming to become the world's greatest swordsman.</p>
+    </div>
+    <div class="character-item">
+        <h4>Nami</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/nami.jpg') }}" alt="Nami" />
+        <p>The navigator of the crew, skilled in cartography and navigation.</p>
+    </div>
+</div>
+
+<h3>Read the Manga</h3>
+<p>You can read the One Piece manga on various platforms:</p>
+<ul>
+    <li><a href="https://www.viz.com/shonenjump/chapters/one-piece" target="_blank">Viz Media</a></li>
+    <li><a href="https://mangaplus.shueisha.co.jp/titles/100022" target="_blank">Manga Plus</a></li>
+</ul>
+{% endblock %}
+
+
+<!--/newpythonProject/templates/templates/news.html-->
+{% extends 'base.html' %}
+
+{% block title %}Latest News{% endblock %}
+
+{% block content %}
+<h2>Latest News</h2>
+<p>Stay updated with the latest releases and events related to One Piece.</p>
+
+<div class="news-list">
+    <div class="news-item">
+        <h3>New Episode Release Every Sunday!</h3>
+        <p>Catch the latest adventures of Luffy and his crew every Sunday on Crunchyroll and Funimation.</p>
+        <img src="{{ url_for('static', filename='images/one_piece/news_episode.jpg') }}" alt="New Episode" />
+    </div>
+
+    <div class="news-item">
+        <h3>Upcoming Movie: One Piece Red!</h3>
+        <p>Get ready for the next big adventure! One Piece Red is set to release in theaters this summer.</p>
+        <img src="{{ url_for('static', filename='images/one_piece/news_movie.jpg') }}" alt="One Piece Red" />
+    </div>
+
+    <div class="news-item">
+        <h3>One Piece Manga Hits 1000 Chapters!</h3>
+        <p>Celebrate the milestone of 1000 chapters of One Piece! Join the community discussions and share your favorite moments.</p>
+        <img src="{{ url_for('static', filename='images/one_piece/news_manga.jpg') }}" alt="1000 Chapters" />
+    </div>
+</div>
+
+<h3>Subscribe for Updates</h3>
+<p>Enter your email to receive the latest news and updates about One Piece directly to your inbox:</p>
+<form>
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="Enter your email" required />
+    <button type="submit">Subscribe</button>
+</form>
+{% endblock %}
+
+<!--/newpythonProject/templates/templates/profile.html-->
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<h2>User Profile</h2>
+
+{% if username %}
+    <p><strong>Username:</strong> {{ username }}</p>
+    <p>Welcome to your profile page!</p>
+    <a href="{{ url_for('logout') }}">Logout</a>
+{% else %}
+    <p>You are not logged in. Please <a href="{{ url_for('login') }}">login</a> to view your profile.</p>
+{% endif %}
+{% endblock %}
+
+
+<!--/newpythonProject/templates/templates/ratings.html-->
+{% extends 'base.html' %}
+
+{% block title %}Ratings{% endblock %}
+
+{% block content %}
+<h2>Ratings</h2>
+<p>Rate your favorite anime, including One Piece, and leave your reviews!</p>
+
+<div class="rating-form">
+    <h3>Rate One Piece</h3>
+    <form>
+        <label for="rating">Select Rating:</label>
+        <select id="rating" required>
+            <option value="" disabled selected>Select your rating</option>
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+        </select>
+
+        <label for="review">Your Review:</label>
+        <textarea id="review" placeholder="Write your review here" required></textarea>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<div class="existing-ratings">
+    <h3>Existing Ratings and Reviews</h3>
+    <ul>
+        <li>
+            <strong>User123:</strong> ⭐⭐⭐⭐⭐
+            <p>One Piece is an amazing journey filled with adventure and friendship!</p>
+        </li>
+        <li>
+            <strong>AnimeFan456:</strong> ⭐⭐⭐⭐
+            <p>Great characters and story, but some arcs feel a bit long.</p>
+        </li>
+        <li>
+            <strong>Reviewer789:</strong> ⭐⭐⭐⭐⭐
+            <p>The best anime I've ever watched! Highly recommend!</p>
+        </li>
+    </ul>
+</div>
+{% endblock %}
+
+<!--auth/register.html-->
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<h2>Login</h2>
+<form method="POST">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" placeholder="Enter your username" required />
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" placeholder="Enter your password" required />
+
+    <button type="submit">Login</button>
+</form>
+
+<p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a>.</p>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+{% endblock %}
+
+<!--newpythonProject/templates/auth/register.html-->
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<h2>Register</h2>
+<form method="POST">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" placeholder="Enter your username" required />
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" placeholder="Enter your password" required />
+
+    <button type="submit">Register</button>
+</form>
+
+<p>Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+{% endblock %}
+
+<!-- /newpythonProject/templates/404.html -->
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<h2>404 Page Not Found</h2>
+<p>Извините, запрашиваемая страница не найдена.</p>
+<a href="{{ url_for('index') }}">Вернуться на главную страницу</a>
+{% endblock %}
+
+
+<!-- /newpythonProject/templates/500.html -->
+{% extends 'base.html' %}
+
+{% block title %}Internal Server Error{% endblock %}
+
+{% block content %}
+<h2>500 Internal Server Error</h2>
+<p>Извините, произошла ошибка на сервере. Пожалуйста, попробуйте позже.</p>
+<a href="{{ url_for('index') }}">Вернуться на главную страницу</a>
+{% endblock %}
+
+/*newpythonProject*/static/css/main.css
+/* Сброс стилей и базовые настройки */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none; /* Убираем стандартные маркеры списков */
+}
+
+/* Основные стили */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    line-height: 1.6; /* Улучшает читаемость текста */
+}
+
+/* Контейнер для центрирования контента */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Заголовок и навигация */
+header {
+    background: #35424a;
+    color: #ffffff;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Добавляет тень к заголовку */
+}
+
+.logo h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+/* Навигация */
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s; /* Плавный переход цвета */
+}
+
+nav a:hover {
+    color: #ffcc00; /* Изменение цвета при наведении */
+}
+
+/* Основной контент */
+main {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Футер */
+footer {
+    text-align: center;
+    padding: 10px 0;
+    background: #35424a;
+    color: #ffffff;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Добавляет тень к футеру */
+}
+
+/* Стили для аниме и персонажей */
+.popular-anime, .featured-characters, .anime-list {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.anime-item, .character-item {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+    background-color: #fff;
+    width: 30%;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s; /* Плавный переход для эффекта наведения */
+}
+
+.anime-item:hover, .character-item:hover {
+    transform: scale(1.05); /* Увеличение элемента при наведении */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Добавляет тень при наведении */
+}
+
+.anime-item img, .character-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* Стили для форм */
+form {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px; /* Ограничение ширины формы */
+    margin: 0 auto; /* Центрирование формы */
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+form label {
+    margin: 10px 0 5px;
+}
+
+form input, form textarea, form select {
+    padding:  10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s; /* Плавный переход для изменения цвета рамки */
+}
+
+form input:focus, form textarea:focus, form select:focus {
+    border-color: #35424a; /* Изменение цвета рамки при фокусе */
+}
+
+/* Кнопки */
+button {
+    padding: 10px;
+    background-color: #35424a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Плавный переход для кнопки */
+}
+
+button:hover {
+    background-color: #2c3e50; /* Изменение цвета кнопки при наведении */
+}
+
+/* Стили для галерей изображений */
+.image-gallery, .character-gallery {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.image-gallery img, .character-gallery img {
+    max-width: 30%;
+    height: auto;
+    margin: 10px;
+    border-radius: 5px;
+    transition: transform 0.3s; /* Плавный переход для эффекта наведения */
+}
+
+.image-gallery img:hover, .character-gallery img:hover {
+    transform: scale(1.05); /* Увеличение изображения при наведении */
+}
+
+/* Стили для новостей */
+.news-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.news-item {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #fff;
+    width: 80%;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s; /* Плавный переход для эффекта наведения */
+}
+
+.news-item:hover {
+    transform: translateY(-5px); /* Поднимает элемент при наведении */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Добавляет тень при наведении */
+}
+
+.news-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* Стили для форума */
+.forum-topics, .create-topic, .recent-posts {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 20px 0;
+    background-color: #fff;
+}
+
+.forum-topics h3, .create-topic h3, .recent-posts h3 {
+    color: #35424a;
+}
+
+.forum-topics ul, .recent-posts ul {
+    list-style-type: none;
+}
+
+/* Стили для существующих оценок */
+.existing-ratings {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 20px 0;
+    background-color: #fff;
+}
+
+.existing-ratings ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.existing-ratings li {
+    margin: 10px 0;
+}
+
+/* Стили для сообщений об ошибках */
+.flashes {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+    color: red; /* Цвет сообщений об ошибках */
+}
+
+@media (max-width: 768px) {
+    .anime-item, .character-item {
+        width: 100%; /* На мобильных устройствах элементы занимают 100% ширины */
+    }
+}

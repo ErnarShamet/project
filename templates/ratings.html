@@ -1,0 +1,47 @@
+<!--/newpythonProject/templates/templates/ratings.html-->
+{% extends 'base.html' %}
+
+{% block title %}Ratings{% endblock %}
+
+{% block content %}
+<h2>Ratings</h2>
+<p>Rate your favorite anime, including One Piece, and leave your reviews!</p>
+
+<div class="rating-form">
+    <h3>Rate One Piece</h3>
+    <form>
+        <label for="rating">Select Rating:</label>
+        <select id="rating" required>
+            <option value="" disabled selected>Select your rating</option>
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+        </select>
+
+        <label for="review">Your Review:</label>
+        <textarea id="review" placeholder="Write your review here" required></textarea>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<div class="existing-ratings">
+    <h3>Existing Ratings and Reviews</h3>
+    <ul>
+        <li>
+            <strong>User123:</strong> ⭐⭐⭐⭐⭐
+            <p>One Piece is an amazing journey filled with adventure and friendship!</p>
+        </li>
+        <li>
+            <strong>AnimeFan456:</strong> ⭐⭐⭐⭐
+            <p>Great characters and story, but some arcs feel a bit long.</p>
+        </li>
+        <li>
+            <strong>Reviewer789:</strong> ⭐⭐⭐⭐⭐
+            <p>The best anime I've ever watched! Highly recommend!</p>
+        </li>
+    </ul>
+</div>
+{% endblock %}

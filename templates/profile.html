@@ -1,0 +1,32 @@
+<!--/newpythonProject/templates/templates/profile.html-->{% extends 'base.html' %}
+
+{% block content %}
+<div class="profile">
+    <h1>Профиль пользователя</h1>
+
+    <div class="user-info">
+        <h2>{{ username }}</h2>
+        <img src="{{ url_for('static', filename='avatars/default_avatar.png') }}" alt="Аватар">
+    </div>
+
+    <div class="user-favorites">
+        <h3>Избранные аниме</h3>
+        {% for favorite in user.favorites %}
+            <div class="favorite-anime">
+                <img src="{{ favorite.anime.image_url }}" alt="{{ favorite.anime.title }}">
+                <p>{{ favorite.anime.title }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="user-reviews">
+        <h3>Мои отзывы</h3>
+        {% for review in user.reviews %}
+            <div class="review">
+                <p>{{ review.anime.title }} - {{ review.rating }}/5</p>
+                <p>{{ review.comment }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

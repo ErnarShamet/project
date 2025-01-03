@@ -1,0 +1,52 @@
+<!--/newpythonProject/templates/templates/forum.html-->
+{% extends 'base.html' %}
+
+{% block title %}Forum{% endblock %}
+
+{% block content %}
+<h2>Forum</h2>
+<p>Join discussions about One Piece, share theories, and connect with other fans!</p>
+
+<div class="forum-topics">
+    <h3>Existing Topics</h3>
+    <ul>
+        <li>
+            <h4><a href="#topic1">Theories about Luffy's Dream</a></h4>
+            <p>Discuss what you think Luffy's ultimate goal is and how he will achieve it!</p>
+        </li>
+        <li>
+            <h4><a href="#topic2">Favorite Straw Hat Crew Member</a></h4>
+            <p>Who is your favorite member of the Straw Hat Pirates and why?</p>
+        </li>
+        <li>
+            <h4><a href="#topic3">Best Fights in One Piece</a></h4>
+            <p>Share your favorite battles and what made them epic!</p>
+        </li>
+    </ul>
+</div>
+
+<div class="create-topic">
+    <h3>Create a New Topic</h3>
+    <form>
+        <label for="topic">Topic Title:</label>
+        <input type="text" id="topic" placeholder="Enter topic title" required />
+
+        <label for="description">Description:</label>
+        <textarea id="description" placeholder="Enter topic description" required></textarea>
+
+        <button type="submit">Post</button>
+    </form>
+</div>
+
+<div class="recent-posts">
+    <h3>Recent Posts</h3>
+    <ul>
+        <li>
+            <strong>User123:</strong> I think Luffy will become the Pirate King by uniting all the pirates!
+        </li>
+        <li>
+            <strong>AnimeFan456:</strong> Zoro's fight against Mihawk was the best moment in the series!
+        </li>
+    </ul>
+</div>
+{% endblock %}

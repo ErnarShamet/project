@@ -1,0 +1,40 @@
+<!--/newpythonProject/templates/templates/about.html-->
+{% extends 'base.html' %}
+
+{% block title %}About One Piece{% endblock %}
+
+{% block content %}
+<h2>About One Piece</h2>
+<p>One Piece is a popular anime and manga series created by Eiichiro Oda. It first premiered in Shueisha's Weekly Shōnen Jump magazine in July 1997 and has since become one of the best-selling manga series of all time.</p>
+
+<h3>Plot Overview</h3>
+<p>The story follows the adventures of Monkey D. Luffy, a young pirate with the ability to stretch his body like rubber after eating a Devil Fruit. Luffy sets out on a journey to find the ultimate treasure known as the One Piece and become the Pirate King.</p>
+
+<h3>Main Characters</h3>
+<ul>
+    <li><strong>Monkey D. Luffy:</strong> The main protagonist and captain of the Straw Hat Pirates.</li>
+    <li><strong>Roronoa Zoro:</strong> The swordsman of the crew, aiming to become the world's greatest swordsman.</li>
+    <li><strong>Nami:</strong> The navigator of the crew, skilled in cartography and navigation.</li>
+    <li><strong>Usopp:</strong> The sharpshooter and storyteller of the crew.</li>
+    <li><strong>Sanji:</strong> The cook of the crew, known for his exceptional culinary skills.</li>
+</ul>
+
+<h3>Impact and Legacy</h3>
+<p>One Piece has had a significant impact on the anime and manga industry, inspiring countless adaptations, merchandise, and even theme park attractions. Its themes of friendship, adventure, and perseverance resonate with fans around the world.</p>
+
+<h3>Learn More</h3>
+<p>For more information about the series, check out the following links:</p>
+<ul>
+    <li><a href="/anime">Explore Anime</a></li>
+    <li><a href="/manga">Discover Manga</a></li>
+    <li><a href="/characters">Meet the Characters</a></li>
+    <li><a href="/news">Latest News</a></li>
+</ul>
+
+<h3>Images</h3>
+<div class="image-gallery">
+    <img src="{{ url_for('static', filename='images/one_piece/characters/luffy.jpg') }}" alt="Luffy" />
+    <img src="{{ url_for('static', filename='images/one_piece/characters/zoro.jpg') }}" alt="Zoro" />
+    <img src="{{ url_for('static', filename='images/one_piece/characters/nami.jpg') }}" alt="Nami" />
+</div>
+{% endblock %}

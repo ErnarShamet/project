@@ -1,0 +1,17 @@
+<!--templates/forum/add_post.html-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="add-forum-post">
+    <h1>Создать новый пост</h1>
+    <form method="POST">
+        <label for="title">Заголовок</label>
+        <input type="text" name="title" required>
+
+        <label for="content">Содержание</label>
+        <textarea name="content" required></textarea>
+
+        <button type="submit">Опубликовать</button>
+    </form>
+</div>
+{% endblock %}

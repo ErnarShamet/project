@@ -1,0 +1,23 @@
+<!--/newpythonProject/templates/anime/add.html-->
+{% extends 'base.html' %}
+
+{% block title %}Добавить аниме{% endblock %}
+
+{% block content %}
+<h2>Добавить аниме</h2>
+<form method="post">
+    <label for="title">Название:</label>
+    <input type="text" name="title" required>
+
+    <label for="description">Описание:</label>
+    <textarea name="description" required></textarea>
+
+    <label for="genre">Жанр:</label>
+    <input type ="text" name="genre" required>
+
+    <label for="image_url">URL изображения:</label>
+    <input type="text" name="image_url">
+
+    <button type="submit">Добавить</button>
+</form>
+{% endblock %}

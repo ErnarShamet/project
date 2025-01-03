@@ -1,0 +1,47 @@
+<!--/newpythonProject/templates/templates/manga.html-->
+{% extends 'base.html' %}
+
+{% block title %}Manga Information{% endblock %}
+
+{% block content %}
+<h2>One Piece Manga Information</h2>
+<p>One Piece is a long-running manga series written and illustrated by Eiichiro Oda. It has been serialized in Shueisha's Weekly Shōnen Jump since July 1997 and has become one of the best-selling manga series of all time.</p>
+
+<h3>Plot Overview</h3>
+<p>The story follows Monkey D. Luffy and his pirate crew as they search for the ultimate treasure known as the One Piece. The manga is known for its rich world-building, diverse characters, and intricate plotlines.</p>
+
+<h3>Story Arcs</h3>
+<ul>
+    <li><strong>East Blue Saga:</strong> The beginning of Luffy's journey and the introduction of key characters.</li>
+    <li><strong>Alabasta Saga:</strong> Luffy and his crew help Princess Vivi save her kingdom from the warlord Crocodile.</li>
+    <li><strong>Sky Island Saga:</strong> The crew explores the sky islands and encounters the enigmatic Enel.</li>
+    <li><strong>Marineford Saga:</strong> A major conflict involving the Marines and the Whitebeard Pirates.</li>
+    <li><strong>Wano Country Saga:</strong> The Straw Hats ally with the samurai to take down the tyrant Kaido.</li>
+</ul>
+
+<h3>Main Characters</h3>
+<div class="character-gallery">
+    <div class="character-item">
+        <h4>Monkey D. Luffy</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/luffy.jpg') }}" alt="Luffy" />
+        <p>The main protagonist and captain of the Straw Hat Pirates.</p>
+    </div>
+    <div class="character-item">
+        <h4>Roronoa Zoro</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/zoro.jpg') }}" alt="Zoro" />
+        <p>The swordsman of the crew, aiming to become the world's greatest swordsman.</p>
+    </div>
+    <div class="character-item">
+        <h4>Nami</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/nami.jpg') }}" alt="Nami" />
+        <p>The navigator of the crew, skilled in cartography and navigation.</p>
+    </div>
+</div>
+
+<h3>Read the Manga</h3>
+<p>You can read the One Piece manga on various platforms:</p>
+<ul>
+    <li><a href="https://www.viz.com/shonenjump/chapters/one-piece" target="_blank">Viz Media</a></li>
+    <li><a href="https://mangaplus.shueisha.co.jp/titles/100022" target="_blank">Manga Plus</a></li>
+</ul>
+{% endblock %}

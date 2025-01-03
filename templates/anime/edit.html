@@ -1,0 +1,23 @@
+<!--/newpythonProject/templates/anime/edit.html-->
+{% extends 'base.html' %}
+
+{% block title %}Редактировать аниме{% endblock %}
+
+{% block content %}
+<h2>Редактировать аниме</h2>
+<form method="post">
+    <label for="title">Название:</label>
+    <input type="text" name="title" value="{{ anime.title }}" required>
+
+    <label for="description">Описание:</label>
+    <textarea name="description" required>{{ anime.description }}</textarea>
+
+    <label for="genre">Жанр:</label>
+    <input type="text" name="genre" value="{{ anime.genre }}" required>
+
+    <label for="image_url">URL изображения:</label>
+    <input type="text" name="image_url" value="{{ anime.image_url }}">
+
+    <button type="submit">Обновить</button>
+</form>
+{% endblock %}

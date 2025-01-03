@@ -1,0 +1,68 @@
+<!--/newpythonProject/templates/templates/index.html-->
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2>Welcome to the World of One Piece!</h2>
+<p>One Piece is a popular anime and manga series created by Eiichiro Oda. It follows the adventures of Monkey D. Luffy and his pirate crew in their quest to find the ultimate treasure known as the One Piece.</p>
+
+<h3>Latest News</h3>
+<ul>
+    <li><a href="/news">New episode release every Sunday!</a></li>
+    <li><a href="/news">Upcoming movie: One Piece Red!</a></li>
+    <li><a href="/news">One Piece manga hits 1000 chapters!</a></li>
+</ul>
+
+<h3>Popular Anime</h3>
+<div class="popular-anime">
+    <div class="anime-item">
+        <h4>One Piece</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/Straw_Hat_Pirates/Anime_OnePiece_Wallpaper_StrawHatPirates_Complete.jpg') }}" alt="One Piece" />
+        <p>Join Luffy and his crew on their epic adventures across the Grand Line in search of the ultimate treasure, the One Piece!</p>
+        <a href="/anime">Learn more</a>
+    </div>
+    <div class="anime-item">
+        <h4>Naruto</h4>
+        <img src="{{ url_for('static', filename='images/naruto/characters/anime_characters.jpg') }}" alt="Naruto" />
+        <p>Follow Naruto Uzumaki as he strives to become the strongest ninja and leader of his village.</p>
+        <a href="/anime/naruto">Learn more</a>
+    </div>
+    <div class="anime-item">
+        <h4>Attack on Titan</h4>
+        <img src="{{ url_for('static', filename='images/attack_on_titan/characters/attack_on_titan.jpg') }}" alt="Attack on Titan" />
+        <p>In a world where humanity is on the brink of extinction due to giant humanoid creatures known as Titans, follow the story of Eren Yeager and his friends as they fight for survival.</p>
+        <a href="/anime/attack_on_titan">Learn more</a>
+    </div>
+</div>
+
+<h3>Featured Characters</h3>
+<div class="featured-characters">
+    <div class="character-item">
+        <h4>Monkey D. Luffy</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/Straw_Hat_Pirates/luffy.jpg') }}" alt="Luffy" />
+        <p>The captain of the Straw Hat Pirates, known for his rubber body and adventurous spirit.</p>
+    </div>
+    <div class="character-item">
+        <h4>Roronoa Zoro</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/Straw_Hat_Pirates/Roronoa Zoro.png') }}" alt="Zoro" />
+        <p>The swordsman of the Straw Hat Pirates, aiming to become the world's greatest swordsman.</p>
+    </div>
+    <div class="character-item">
+        <h4>Nami</h4>
+        <img src="{{ url_for('static', filename='images/one_piece/characters/Straw_Hat_Pirates/Nami.png') }}" alt="Nami" />
+        <p>The navigator of the Straw Hat Pirates, skilled in cartography and navigation.</p>
+    </div>
+</div>
+
+<h3>Join the Community</h3>
+<p>Discuss your favorite episodes, share theories, and connect with other fans on our <a href="/forum">forum</a>.</p>
+
+<h3>Follow Us</h3>
+<p>Stay connected with us on social media:</p>
+<ul class="social-media">
+    <li><a href="https://twitter.com/OnePiece" target="_blank">Twitter</a></li>
+    <li><a href="https://www.facebook.com/OnePiece" target="_blank">Facebook</a></li>
+    <li><a href="https://www.instagram.com/onepiece_official" target="_blank">Instagram</a></li>
+</ul>
+{% endblock %}

@@ -1,0 +1,37 @@
+<!--/newpythonProject/templates/templates/news.html-->
+{% extends 'base.html' %}
+
+{% block title %}Latest News{% endblock %}
+
+{% block content %}
+<h2>Latest News</h2>
+<p>Stay updated with the latest releases and events related to One Piece.</p>
+
+<div class="news-list">
+    <div class="news-item">
+        <h3>New Episode Release Every Sunday!</h3>
+        <p>Catch the latest adventures of Luffy and his crew every Sunday on Crunchyroll and Funimation.</p>
+        <img src="{{ url_for('static', filename='images/one_piece/news_episode.jpg') }}" alt="New Episode" />
+    </div>
+
+    <div class="news-item">
+        <h3>Upcoming Movie: One Piece Red!</h3>
+        <p>Get ready for the next big adventure! One Piece Red is set to release in theaters this summer.</p>
+        <img src="{{ url_for('static', filename='images/one_piece/news_movie.jpg') }}" alt="One Piece Red" />
+    </div>
+
+    <div class="news-item">
+        <h3>One Piece Manga Hits 1000 Chapters!</h3>
+        <p>Celebrate the milestone of 1000 chapters of One Piece! Join the community discussions and share your favorite moments.</p>
+        <img src="{{ url_for('static', filename='images/one_piece/news_manga.jpg') }}" alt="1000 Chapters" />
+    </div>
+</div>
+
+<h3>Subscribe for Updates</h3>
+<p>Enter your email to receive the latest news and updates about One Piece directly to your inbox:</p>
+<form>
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="Enter your email" required />
+    <button type="submit">Subscribe</button>
+</form>
+{% endblock %}

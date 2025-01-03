@@ -1,0 +1,27 @@
+<!--templates/forum/detail.html-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="forum-post-detail">
+    <h1>{{ post.title }}</h1>
+    <p>{{ post.content }}</p>
+    <p>Автор: {{ post.author.username }}</p>
+    <p>Дата: {{ post.created_at }}</p>
+
+    <h2>Комментарии</h2>
+    {% for comment in comments %}
+        <div class="comment">
+            <p>{{ comment.user.username }}: {{ comment.content }}</p>
+            <small>{{ comment.created_at }}</small>
+        </div>
+    {% endfor %}
+
+    {% if 'username' in session %}
+    <h3>Добавить комментарий</h3>
+    <form action="{{ url_for('add_forum_comment', post_id=post.id) }}" method="POST">
+        <textarea name="content" placeholder="Ваш комментарий"></textarea>
+        <button type="submit">Отправить</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

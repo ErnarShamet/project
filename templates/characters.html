@@ -1,0 +1,23 @@
+<!--/newpythonProject/templates/templates/characters.html-->
+{% extends 'base.html' %}
+
+{% block title %}Characters{% endblock %}
+
+{% block content %}
+<h2>Characters from One Piece</h2>
+<div class="character">
+    <h3>Monkey D. Luffy</h3>
+    <img src="{{ url_for('static', filename='images/one_piece/characters/luffy.jpg') }}" alt="Luffy" />
+    <p>Captain of the Straw Hat Pirates and the main protagonist of One Piece.</p>
+</div>
+<div class="character">
+    <h3>Roronoa Zoro</h3>
+    <img src="{{ url_for('static', filename='images/one_piece/characters/zoro.jpg') }}" alt="Zoro" />
+    <p>The swordsman of the Straw Hat Pirates, known for his ambition to become the world's greatest swordsman.</p>
+</div>
+<div class="character">
+    <h3>Nami</h3>
+    <img src="{{ url_for('static', filename='images/one_piece/characters/nami.jpg') }}" alt="Nami" />
+    <p>The navigator of the Straw Hat Pirates, known for her cartography skills and love for treasure.</p>
+</div>
+{% endblock %}
